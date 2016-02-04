@@ -2,25 +2,11 @@
 
 namespace samsoncms\email;
 
-use Aws\Common\Credentials\Credentials;
-use Aws\Ses\SesClient;
-use samson\activerecord\client;
 use samson\activerecord\email_distribution;
 use samson\activerecord\email_letter;
 use samson\activerecord\email_template;
 use samson\core\SamsonLocale;
-use samson\instagram\Instagram;
-use samsoncms\api\OutfitQuery;
-use samsoncms\api\Product;
-use samsoncms\api\ProductQuery;
-use samsonframework\orm\Relation;
-use samsonphp\event\Event;
-use samson\activerecord\dbQuery;
 
-require_once 'Collection.php';
-require_once 'field/Template.php';
-require_once 'field/Control.php';
-require_once 'field/Status.php';
 
 class Application extends \samsoncms\Application
 {
@@ -39,7 +25,7 @@ class Application extends \samsoncms\Application
     /** @var string $icon Icon class */
     public $icon = 'envelope';
 
-    public $hide = true;
+    public $hide = false;
 
     public function prepare()
     {
@@ -106,18 +92,7 @@ class Application extends \samsoncms\Application
     {
         $description = t($this->description, true);
         $name = t($this->description, true);
-
-        $clients = $this->getSubscribedUsers();
-
-        $selectClient = '<select multiple id="emailClientSelect" name="recipients">';
-        foreach ($clients as $client) {
-            $selectClient .= '<option value="'.$client->id.'">'.$client->email.'</option>';
-        }
-        $selectClient .= '</select>';
-
-        $subscribersCount = sizeof($clients);
-
-        $letter = $this->view('letter/index')->outfits('')->letterHeader(t('Preview', true))->letterMessage(t('Preview', true))->output();
+        $letter = $this->createLetter('HEADER', 'MESSAGE');
 
         // Prepare view
         $this->title($description)
@@ -125,8 +100,6 @@ class Application extends \samsoncms\Application
             ->set('name', $name)
             ->set('icon', $this->icon)
             ->set('letter', $letter)
-            ->subscribersCount($subscribersCount)
-            ->clientSelect($selectClient)
             ->set('description', $description)
         ;
     }
@@ -185,16 +158,7 @@ class Application extends \samsoncms\Application
      */
     public function __async_make($preview = 0)
     {
-        /** @var client[] $recipients */
-        $recipients = null;
-        // Check recipient count
-        if (isset($_POST['allRecipients']) && $_POST['allRecipients'] == 'on') {
-            $recipients = $this->getSubscribedUsers();
-        } else {
-            $recipients = explode(',', $_POST['_orderrecipients']);
-            array_pop($recipients);
-            $recipients = dbQuery('user')->where('user_id', $recipients)->exec();
-        }
+        $recipients = explode(',', $_POST['recipients']);
 
         $letters = array();
         foreach (SamsonLocale::$locales as $locale) {
@@ -223,7 +187,7 @@ class Application extends \samsoncms\Application
             foreach ($recipients as $recipient) {
                 $emailLetter = new email_letter();
                 $emailLetter->distribution_id = $distribution->distribution_id;
-                $emailLetter->recipient = $recipient->email;
+                $emailLetter->recipient = trim($recipient);
                 $emailLetter->template_id = $templates[SamsonLocale::$defaultLocale]->template_id;
                 $emailLetter->save();
             }
@@ -243,7 +207,7 @@ class Application extends \samsoncms\Application
         foreach ($letters as $letter) {
             $template = dbQuery('email_template')->where('template_id', $letter->template_id)->first();
             $message = $template->content;
-            $img = '<img width="1" height="1" src="'.str_replace('wundermodel.local', 'wundermodel.local.samsonos.com', url()->build('newsletter/openaction/'.$letter->distribution_id)).'">';
+            $img = '<img width="1" height="1" src="'.url()->build('newsletter/openaction/'.$letter->distribution_id).'">';
             $message .= $img;
             $message = str_replace('clickaction/', 'clickaction/'.$letter->distribution_id.'/', $message);
             $this->sendEmail($message, $letter->recipient);
@@ -255,36 +219,12 @@ class Application extends \samsoncms\Application
     /**
      * @param string $letter Letter html content
      * @param string $recipient email recipient
+     * @param string $from Sender email
+     * @param string $subject Email subject
+     * @param string $user Sender name
      */
-    public function sendEmail($letter, $recipient = 'onysko@samsonos.com')
+    public function sendEmail($letter, $recipient = '', $from = '', $subject = '', $user = '')
     {
-        $client = SesClient::factory(array(
-            'credentials' => new Credentials('AKIAJWWRY2GTVOEJAYLA', 'HHXrswBKtG9jmj5ky7W9ZYPHOWYQOe8e99rM+dRO'),
-            'region' => 'eu-west-1'
-        ));
-
-        $result = $client->sendEmail(array(
-            // Source is required
-            'Source' => 'Name <noreply@wundermodel.com>',
-            // Destination is required
-            'Destination' => array(
-                'ToAddresses' => array($recipient),
-            ),
-            // Message is required
-            'Message' => array(
-                // Subject is required
-                'Subject' => array(
-                    // Data is required
-                    'Data' => 'WUNDERMODEL',
-                ),
-                // Body is required
-                'Body' => array(
-                    'Html' => array(
-                        // Data is required
-                        'Data' => $letter,
-                    ),
-                ),
-            ),
-        ));
+        mail_send($recipient, $from, $letter, $subject, $user);
     }
 }

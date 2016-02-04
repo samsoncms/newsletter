@@ -2,12 +2,10 @@
 
 namespace samsoncms\email;
 
-use samson\activerecord\dbQuery;
+use samsoncms\email\field\Control;
+use samsoncms\email\field\Status;
+use samsoncms\email\field\Template;
 use samsoncms\field\Generic;
-use samsonframework\orm\QueryInterface;
-use wundermodel\cms\newsletter\field\Status;
-use wundermodel\cms\newsletter\field\Template;
-use wundermodel\cms\newsletter\field\Control;
 
 class Collection extends \samsoncms\Collection
 {

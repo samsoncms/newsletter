@@ -23,16 +23,16 @@
   "license": "Open Software License (OSL) v 3.0",
   "homepage": "http://samsonos.com/",
   "autoload": {
-    "classmap": ["src/"],
+    "classmap": ["src/*"],
     "psr-4": {
-      "samsonframework\\resource\\": "src/"
+      "samsoncms\\email\\": "src/"
     }
   },
   "config":{
     "github-protocols":["https"]
   },
-  "extra": { 
-    "samsonphp_package_compressable": "1", 
+  "extra": {
+    "samsonphp_package_compressable": "1",
     "samson_module_include": "1"
   }
 }
