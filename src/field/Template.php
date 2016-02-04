@@ -1,7 +1,6 @@
 <?php
 
-namespace samsoncms\email\field;
-
+namespace samsoncms\newsletter\field;
 
 use samsoncms\field\Generic;
 use samsonframework\core\RenderInterface;
