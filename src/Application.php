@@ -11,16 +11,16 @@ use samson\core\SamsonLocale;
 class Application extends \samsoncms\Application
 {
     /** @var string Module identifier */
-    protected $id = 'distribution';
+    protected $id = 'newsletter';
 
     /** @var string Entity class name */
     protected $entity = '\samson\activerecord\email_distribution';
 
     /** Application name */
-    public $name = 'Email';
+    public $name = 'Newsletter';
 
     /** Application description */
-    public $description = 'Email distribution management';
+    public $description = 'Newsletter distribution management';
 
     /** @var string $icon Icon class */
     public $icon = 'envelope';
