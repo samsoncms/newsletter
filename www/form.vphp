@@ -18,13 +18,9 @@
     <div class="newsletter-app">
         <div class="inl-block">
             <form class="send-form" action="<?php module_url('make') ?>" method="post">
-                <label for="recipient">Recipients (<span class="entity-count-recipient">0</span>)</label>
+                <label for="recipient">Recipients</label>
 
-                <?php iv('clientSelect') ?>
-
-                <div class="chb-block">
-                    <input data-custom="<?php v('subscribersCount') ?>" class="all-recipients-chb" type="checkbox" name="allRecipients"><span><?php t('All') ?></span>
-                </div>
+                <textarea type="text" name="recipients" placeholder="Recipients (comma separated)"></textarea>
 
                 <label>Header</label>
 
