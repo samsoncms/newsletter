@@ -1,10 +1,10 @@
 <?php
 
-namespace samsoncms\email;
+namespace samsoncms\newsletter;
 
-use samsoncms\email\field\Control;
 use samsoncms\email\field\Status;
 use samsoncms\email\field\Template;
+use samsoncms\field\Control;
 use samsoncms\field\Generic;
 
 class Collection extends \samsoncms\Collection

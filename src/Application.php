@@ -1,12 +1,11 @@
 <?php
 
-namespace samsoncms\email;
+namespace samsoncms\newsletter;
 
 use samson\activerecord\email_distribution;
 use samson\activerecord\email_letter;
 use samson\activerecord\email_template;
 use samson\core\SamsonLocale;
-
 
 class Application extends \samsoncms\Application
 {
@@ -27,6 +26,10 @@ class Application extends \samsoncms\Application
 
     public $hide = false;
 
+    /**
+     * Prepare DB for application settings
+     * @return mixed
+     */
     public function prepare()
     {
         db()->execute(
@@ -77,14 +80,6 @@ class Application extends \samsoncms\Application
     }
 
     /**
-     * Get list of users that are subscribed for newsletters
-     */
-    protected function getSubscribedUsers()
-    {
-        return dbQuery('user')->exec();
-    }
-
-    /**
      * Universal controller action.
      * Entity collection rendering
      */
@@ -104,21 +99,30 @@ class Application extends \samsoncms\Application
         ;
     }
 
+    /**
+     * Save number of email opens
+     * @param int $distribution_id Distribution identifier
+     */
     public function __openaction($distribution_id)
     {
         /** @var email_distribution $distribution */
         $distribution = null;
-        if (dbQuery('email_distribution')->where('distribution_id', $distribution_id)->first($distribution)) {
+        if ($this->query->entity('email_distribution')->where('distribution_id', $distribution_id)->first($distribution)) {
             $distribution->open_count ++;
             $distribution->save();
         }
     }
 
+    /**
+     * Save number of email clicks
+     * @param int $distribution_id Distribution identifier
+     * @param string $params
+     */
     public function __clickaction($distribution_id, $params = '')
     {
         /** @var email_distribution $distribution */
         $distribution = null;
-        if (dbQuery('email_distribution')->where('distribution_id', $distribution_id)->first($distribution)) {
+        if ($this->query->entity('email_distribution')->where('distribution_id', $distribution_id)->first($distribution)) {
             $distribution->click_count ++;
             $distribution->save();
 
@@ -134,12 +138,17 @@ class Application extends \samsoncms\Application
         }
     }
 
+    /**
+     * Show template content
+     * @param int $id Template identifier
+     * @return array
+     */
     public function __async_templates($id)
     {
         /** @var $this->entity $outfit */
         $template = null;
         $response = array('status' => 0, 'popup' => '');
-        if (dbQuery('email_template')->where('template_id', $id)->first($template)) {
+        if ($this->query->entity('email_template')->where('template_id', $id)->first($template)) {
             $response['popup'] = $this->view('template/popup')->content($template->content)->output();
             $response['status'] = 1;
         }
@@ -147,6 +156,12 @@ class Application extends \samsoncms\Application
         return $response;
     }
 
+    /**
+     * Create template content
+     * @param string $header Email Header
+     * @param string $message Email text
+     * @return string
+     */
     public function createLetter($header, $message)
     {
         return '<h1>'.$header.'</h1><br><div>'.$message.'</div>';
@@ -201,11 +216,8 @@ class Application extends \samsoncms\Application
      */
     public function __manual()
     {
-        /** @var email_letter[] $letters */
-        $letters = dbQuery('email_letter')->where('status', 0)->exec();
-
-        foreach ($letters as $letter) {
-            $template = dbQuery('email_template')->where('template_id', $letter->template_id)->first();
+        foreach ($this->query->entity('email_letter')->where('status', 0)->exec() as $letter) {
+            $template = $this->query->entity('email_template')->where('template_id', $letter->template_id)->first();
             $message = $template->content;
             $img = '<img width="1" height="1" src="'.url()->build('newsletter/openaction/'.$letter->distribution_id).'">';
             $message .= $img;

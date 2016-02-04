@@ -1,11 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: egorov
- * Date: 21.04.2015
- * Time: 14:52
- */
-namespace samsoncms\email\field;
+
+namespace samsoncms\newsletter\field;
 
 use samsoncms\field\Generic;
 use samsonframework\core\RenderInterface;
