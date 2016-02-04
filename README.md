@@ -1,0 +1,2 @@
+# newsletter
+SamsonCMS newsletter module
