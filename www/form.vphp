@@ -1,0 +1,55 @@
+<!-- Top section -->
+<section class="top clearfix">
+
+    <div class="top-inline-block">
+        <!-- Header block -->
+        <h1 title="<?php iv('description')?>">
+            <i class="icon2 icon_16x16 left icon2-<?php iv('icon')?>"></i>
+            <?php iv('name')?>
+        </h1>
+        <!-- End of Header block -->
+    </div>
+
+</section>
+<!-- End of Top section -->
+
+<!-- Content section -->
+<section id="content">
+    <div class="newsletter-app">
+        <div class="inl-block">
+            <form class="send-form" action="<?php module_url('make') ?>" method="post">
+                <label for="recipient">Recipients (<span class="entity-count-recipient">0</span>)</label>
+
+                <?php iv('clientSelect') ?>
+
+                <div class="chb-block">
+                    <input data-custom="<?php v('subscribersCount') ?>" class="all-recipients-chb" type="checkbox" name="allRecipients"><span><?php t('All') ?></span>
+                </div>
+
+                <label>Header</label>
+
+                <?php foreach (\samson\core\SamsonLocale::$locales as $locale) { ?>
+                    <textarea id="header" name="header-<?php echo $locale ?>" placeholder="<?php echo $locale ?> header"></textarea>
+                <?php } ?>
+
+                <label>Message</label>
+
+                <?php foreach (\samson\core\SamsonLocale::$locales as $locale) { ?>
+                    <textarea id="message" name="message-<?php echo $locale ?>" placeholder="<?php echo $locale ?> message"></textarea>
+                <?php } ?>
+
+                <div class="button-group">
+                    <a class="preview-link" href="<?php module_url('make/1') ?>">Preview</a>
+                    <input type="submit" value="Save">
+                </div>
+
+            </form>
+        </div><div class="inl-block">
+            <div id="previewLetter" style="width: 100%; min-height: 800px; padding: 10px; overflow: scroll; border: 1px solid grey;">
+                <?php iv('letter') ?>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End of Content section -->
+

@@ -1,0 +1,3 @@
+<div class="table2-col <?php iv('class') ?>">
+    <a style="text-align: center; font-size: 24px; display: block;" title="<?php t('Show template') ?>" class="newsletter-template-link" href="<?php module_url('templates', 'item_template_id') ?>"><i class="icon2 icon2-code"></i></a>
+</div>
